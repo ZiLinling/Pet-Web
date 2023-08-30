@@ -6,37 +6,34 @@
           <el-button type="primary" @click="add">新增</el-button>
           <el-button type="warning" @click="delAll">批量删除</el-button>
         </div>
-        <div class="search">
-          <div>账号<el-input v-model="searchData.account" placeholder="输入账号搜索" /></div>
-          <div>用户名<el-input v-model="searchData.name" placeholder="输入昵称搜索" /></div>
-          <el-button icon="el-icon-search" circle @click="search()"></el-button>
-        </div>
       </template>
       <template slot="tb-columns">
-        <!-- <el-table-column label="头像" width="120" align="center">
+        <el-table-column label="商品图片" width="120" align="center">
           <template slot-scope="scope">
-            <el-image style="width: 100px; height: 100px" :src="getUrl(scope.row.img)"
-              fit="fill"></el-image>
+            <el-image style="width: 100px; height: 100px" :src="getUrl(scope.row.img)" fit="fill"></el-image>
           </template>
-        </el-table-column> -->
-        <el-table-column prop="id" label="ID" width="120" align="center"></el-table-column>
-        <el-table-column prop="name" label="收件人姓名" width="160" align="center"></el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" align="center"></el-table-column>
-        <el-table-column prop="address" label="地址" width="180" align="center"></el-table-column>
-        <el-table-column prop="telephone" label="电话" width="180" align="center"></el-table-column>
-        <el-table-column prop="price" label="总价" width="60" align="center"></el-table-column>
-        <!-- <el-table-column align="center" label="权限" width="140">
+        </el-table-column>
+        <el-table-column prop="name" label="商品名称" width="160" align="center"></el-table-column>
+        <el-table-column prop="etc.storeName" label="商店名称" width="160" align="center"></el-table-column>
+        <el-table-column prop="num" label="数量" width="180" align="center"></el-table-column>
+        <el-table-column prop="price" label="单价" width="180" align="center"></el-table-column>
+        <el-table-column prop="etc.status" label="状态" width="180" align="center">
           <template slot-scope="scope">
-            {{ role[scope.row.role].name }}
+            {{ orderType[scope.row.etc.status] }}
+            <!-- 订单状态
+                (1为unpaid:'等待付款'，
+                2为back:'等待商家发货'，
+                3为unreceived:'商家已发货'，
+                4为received:'等待用户评价'，
+                5为completed:'交易已完成'，
+                6为refunds:'商品退货处理中'，
+                7为cancelled:'订单已取消') -->
           </template>
-        </el-table-column> -->
-        <el-table-column prop="postscript" label="备注" width="160" align="center">
         </el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <router-link :to="{ name: 'orderItem', query: { 'orderId': scope.row.id } }">
-              <el-button type="default" style="margin-right: 10px;">查看商品详情</el-button>
-            </router-link>
+            <el-button @click="identify(scope.row.id)" v-show="scope.row.etc.status == 5">退换确认</el-button>
+            <el-button @click="delive(scope.row.id)" v-show="scope.row.etc.status == 2">发货</el-button>
             <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
             <el-button type="danger" @click="del(scope.row.id, scope.row.img.substring(directory.length))">删除</el-button>
           </template>
@@ -46,9 +43,10 @@
     <Edit :title=title :visible=visible v-if="visible" :defaultObj=defaultObj @close="close"></Edit>
   </div>
 </template>
-
+  
 <script>
 import { getRequest, postJsonRequest, postRequest, base_url, deleteRequest } from '@/api/axios'
+import { delivery,identify } from '@/api/orderItem'
 import PageTable from '@/components/Edit/PageTable'
 import Edit from '@/components/Edit/OrderEdit'
 
@@ -69,22 +67,48 @@ export default {
         { id: 0, name: "会员" },
         { id: 1, name: "管理员" },
       ],
-      searchData: {
-        account: "",
-        name: "",
-      },
+      searchData: { orderId: null },
+      orderType: ['全部', '待付款', '待发货', '待收货', '待评价', '退换货','已取消'],
     }
   },
+  created() {
+    //将orderId传进来
+    this.searchData.orderId = this.$route.query.orderId
+  },
   methods: {
+    delive(id) {
+      this.$confirm("是否发货?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        delivery("/orderItem/delivery", { id: id }).then((response) => {
+          console.log(response)
+          this.$refs.dataTable.loadTableData("reload")
+        })
+      }).catch(() => {
+      })
+    },
+    identify(id) {
+      this.$confirm("是否确认?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        identify("/orderItem/cancelOrderItem", { ids: id }).then((response) => {
+          console.log(response)
+          this.$refs.dataTable.loadTableData("reload")
+        })
+      }).catch(() => {
+      })
+    },
+
     getUrl(url) {
       if (url == null) {
-        return base_url+"/resource/tool/placeholder.png"
+        return base_url + "/resource/tool/placeholder.png"
       } else {
         return base_url + url
       }
-    },
-    search() {
-      this.$refs.dataTable.loadTableData('reload')
     },
     selectionChange(selection) {
       var ids = []
@@ -138,37 +162,30 @@ export default {
       }
     },
     loadTableData(filter, callback) {
-      getRequest("/order/getList", {
+      console.log("11", this.searchData);
+      getRequest("/orderItem/getList", {
         ...filter,
         ...this.searchData
       }).then((response) => {
         // res = result
         let data = {
-          data: response.data.data.records,
-          total: response.data.data.total
+          data: [],
+        };
+        console.log("lenghth", response.data.data.data)
+        for (let i = 0; i < response.data.data.data.length; i++) {
+          data.data.push(response.data.data.data[i]);
         }
+        console.log("11", data)
         callback(data)
-        console.log("data",response.data.data)
+
       }).catch((error) => {
       })
     }
-  }
+  },
+
 }
 </script>
 <style scoped>
-.search>div {
-  width: 18%;
-  display: inline-block;
-  margin-left: 20px;
-  font-size: 14px;
-}
-
-.search>div>.el-input,
-.search>div>.el-select {
-  width: 75%;
-  margin-left: 10px;
-}
-
 .el-header,
 .el-footer {
   background-color: #B3C0D1;

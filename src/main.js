@@ -13,6 +13,8 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+// main.js文件中引入并全局注册
+
 
 /**
  * If you don't want to use mock-server

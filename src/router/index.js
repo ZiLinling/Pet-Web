@@ -57,7 +57,7 @@ export const constantRoutes = [
   {
     path: '/manage',
     component: Layout,
-    redirect: '/manage/table',
+    redirect: '/manage/user',
     name: 'Manage',
     meta: { title: '管理', icon: 'el-icon-s-help' },
     children: [
@@ -77,7 +77,14 @@ export const constantRoutes = [
         path: 'order',
         name: 'Order',
         component: () => import('@/views/manage/order'),
-        meta: { title: '订单管理', icon: 'tree' }
+        meta: { title: '订单管理', icon: 'tree' },
+      },
+      {
+        path: '/orderItem',
+        name: 'orderItem',
+        hidden: true,
+        component: () => import('@/views/manage/orderItem'),
+        meta: { title: '订单详情', icon: 'table' }
       },
       {
         path: 'breed',
@@ -98,6 +105,28 @@ export const constantRoutes = [
         hidden: true,
         component: () => import('@/views/manage/goods'),
         meta: { title: '周边管理', icon: 'table' }
+      },
+      
+    ]
+  },
+  {
+    path: '/data',
+    component: Layout,
+    redirect: '/data/store',
+    name: 'Store',
+    meta: { title: '数据', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'store',
+        name: 'store',
+        component: () => import('@/views/data/store'),
+        meta: { title: '商店数据', icon: 'table' }
+      },
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/data/user'),
+        meta: { title: '用户数据', icon: 'table' }
       },
     ]
   },

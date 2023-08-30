@@ -166,6 +166,7 @@ export default {
           data: response.data.data.records,
           total: response.data.data.total
         }
+        console.log(response.data.data)
         callback(data)
       }).catch((error) => {
       })
