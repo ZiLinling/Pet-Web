@@ -171,9 +171,9 @@ export default {
         let data = {
           data: [],
         };
-        console.log("lenghth", response.data.data.data)
-        for (let i = 0; i < response.data.data.data.length; i++) {
-          data.data.push(response.data.data.data[i]);
+        console.log("lenghth", response.data.data)
+        for (let i = 0; i < response.data.data.length; i++) {
+          data.data.push(response.data.data[i]);
         }
         console.log("11", data)
         callback(data)

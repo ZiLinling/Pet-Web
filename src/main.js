@@ -13,8 +13,8 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
-// main.js文件中引入并全局注册
 
+import * as echarts from 'echarts'
 
 /**
  * If you don't want to use mock-server
@@ -29,6 +29,7 @@ if (process.env.NODE_ENV === 'production') {
   mockXHR()
 }
 
+Vue.prototype.$echarts = echarts
 
 Vue.use(ElementUI)
 Vue.config.productionTip = false
