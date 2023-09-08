@@ -38,7 +38,7 @@
               <el-button type="default" style="margin-right: 10px;">查看商品详情</el-button>
             </router-link>
             <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="del(scope.row.id, scope.row.img.substring(directory.length))">删除</el-button>
+            <el-button type="danger" @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </template>
@@ -86,18 +86,6 @@ export default {
     search() {
       this.$refs.dataTable.loadTableData('reload')
     },
-    selectionChange(selection) {
-      var ids = []
-      var imgs = []
-      for (var item of selection) {
-        ids.push(item.id)
-        //去除img前面的/resouce/avatar/,保留id存入imgs
-        imgs.push(item.img.substring(this.directory.length))
-      }
-      console.log(imgs)
-      this.ids = ids.join(",")
-      this.imgs = imgs.join(",")
-    },
     add() {
       this.visible = true
       this.title = "新增"
@@ -110,24 +98,21 @@ export default {
     },
     delAll() {
       if (this.ids.length == 0) {
-        this.$message.warning("请选择用户")
+        this.$message.warning("请选择订单")
       } else {
         this.del(this.ids, this.imgs)
       }
     },
-    del(ids, imgs) {
-      console.log(imgs)
+    del(ids) {
       this.$confirm("是否删除?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        postRequest("/user/delete", { ids: ids }).then((response) => {
-          deleteRequest(this.directory + imgs)
+        postRequest("/order/delete", { ids: ids }).then((response) => {
           this.$message.success("删除成功")
           this.$refs.dataTable.loadTableData("reload")
         })
-      }).catch(() => {
       })
     },
     close(val) {

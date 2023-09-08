@@ -9,20 +9,23 @@
                     <i v-show="!this.form.img" class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </el-form-item> -->
-            <el-form-item label="ID" prop="id">
-                <el-input v-model="form.id" autocomplete="off" style="width:30%" :disabled="this.saveOrUpdate">
+            <el-form-item label="ID" prop="id" v-if="this.saveOrUpdate">
+                <el-input v-model="form.id" autocomplete="off" style="width:30%"  :disabled="true">
                 </el-input>
+            </el-form-item>
+            <el-form-item label="用户编号" prop="userId">
+                <el-input v-model="form.userId" autocomplete="off" style="width:40%"></el-input>
             </el-form-item>
             <el-form-item label="收件人姓名" prop="name">
                 <el-input v-model="form.name" autocomplete="off" style="width:40%"></el-input>
             </el-form-item>
             <el-form-item label="收件人地址" prop="address" >
-                <el-input v-model="form.address" autocomplete="off" style="width:50%"></el-input>
+                <el-input v-model="form.address" autocomplete="off" style="width:70%"></el-input>
             </el-form-item>
             <el-form-item label="收件人电话" prop="telephone" >
                 <el-input v-model="form.telephone" autocomplete="off" style="width:30%"></el-input>
             </el-form-item>
-            <el-form-item label="总价" prop="form.price">
+            <el-form-item label="总价" prop="price">
                 <el-input v-model="form.price" autocomplete="off" style="width:30%" :disabled="this.saveOrUpdate">
                 </el-input>
             </el-form-item>
@@ -37,7 +40,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="状态" prop="status">
-                <el-select v-model="form.status" placeholder="请设置用户状态">
+                <el-select v-model="form.status" placeholder="请设置订单状态">
                     <el-option v-for="(item, index) in status" :key="index" :label="item.name" :value="item.id">
                     </el-option>
                 </el-select>
@@ -72,20 +75,20 @@ export default {
             saveOrUpdate: false, //false= save  true = update
             password: "",
             rules: {
-                account: [
+                userId: [
                     { required: true, message: '请填写账号', trigger: 'change' }
                 ],
                 name: [
                     { required: true, message: '请填写昵称', trigger: 'change' }
                 ],
-                password: [
-                    { required: true, message: '请填写密码', trigger: 'change' }
+                address: [
+                    { required: true, message: '请填写地址', trigger: 'change' }
                 ],
-                role: [
-                    { required: true, message: '请设置权限', trigger: 'change' }
+                telephone: [
+                    { required: true, message: '请填写电话', trigger: 'change' }
                 ],
-                status: [
-                    { required: true, message: '请设置用户状态', trigger: 'change' }
+               price: [
+                    { required: true, message: '请设置金额', trigger: 'change' }
                 ],
             }
         }
@@ -153,44 +156,28 @@ export default {
         },
         save() {
             this.$refs["form"].validate((valid) => {
-                if (valid) {
-                    if (this.password.length != 0) {
-                        this.form.password = this.password
-                    }
-                    if (saveOrUpdate) {
-                        this.form.password = password
-                    } else {
-                        this.form.password = md5(md5(this.form.password))
-                    }
-                    this.form.password = this.form.password
-                    if (this.imageUrl != this.form.img) {
-                        this.$refs["img"].submit()
-                    }
-                    else {
                         this.saveUpdate()
-                    }
-                }
-            })
+                })
         },
         saveUpdate() {
             if (this.saveOrUpdate) {
-                postJsonRequest("/user/update", {
+                postJsonRequest("/order/update", {
                     ...this.form
                 }).then(res => {
                     this.flag = true
                     this.$emit("close", this.flag)
-                    this.$message.success("更新用户信息成功")
+                    this.$message.success("更新信息成功")
                 }).catch(err => {
                     this.flag = false
                     this.$emit("close", this.flag)
                 })
             } else {
-                postJsonRequest("/user/add", {
+                postJsonRequest("/order/generate", {
                     ...this.form
                 }).then(res => {
                     this.flag = true
                     this.$emit("close", this.flag)
-                    this.$message.success("新增用户成功")
+                    this.$message.success("新增订单成功")
                 }).catch((error) => {
                     this.flag = false
                     this.$emit("close", this.flag)

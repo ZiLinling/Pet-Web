@@ -17,7 +17,7 @@
         <el-table-column prop="etc.storeName" label="商店名称" width="160" align="center"></el-table-column>
         <el-table-column prop="num" label="数量" width="180" align="center"></el-table-column>
         <el-table-column prop="price" label="单价" width="180" align="center"></el-table-column>
-        <el-table-column prop="etc.status" label="状态" width="180" align="center">
+        <el-table-column prop="status" label="状态" width="180" align="center">
           <template slot-scope="scope">
             {{ orderType[scope.row.etc.status] }}
             <!-- 订单状态
@@ -40,7 +40,7 @@
         </el-table-column>
       </template>
     </pageTable>
-    <Edit :title=title :visible=visible v-if="visible" :defaultObj=defaultObj @close="close"></Edit>
+    <Edit :title=title :visible=visible v-if="visible" :defaultObj=defaultObj :orderId=searchData.orderId @close="close"></Edit>
   </div>
 </template>
   
@@ -48,13 +48,14 @@
 import { getRequest, postJsonRequest, postRequest, base_url, deleteRequest } from '@/api/axios'
 import { delivery,identify } from '@/api/orderItem'
 import PageTable from '@/components/Edit/PageTable'
-import Edit from '@/components/Edit/OrderEdit'
+import Edit from '@/components/Edit/orderItemEdit'
 
 export default {
   name: "userManage",
   components: { PageTable, Edit },
   data() {
     return {
+      orderId:null,
       base_url: base_url,
       title: "新增",
       directory: "/resource/avatar/",
@@ -74,6 +75,7 @@ export default {
   created() {
     //将orderId传进来
     this.searchData.orderId = this.$route.query.orderId
+    this.orderId=this.$route.query.orderId
   },
   methods: {
     delive(id) {
@@ -140,13 +142,13 @@ export default {
       }
     },
     del(ids, imgs) {
-      console.log(imgs)
+     console.log(ids);
       this.$confirm("是否删除?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        postRequest("/user/delete", { ids: ids }).then((response) => {
+        postRequest("/orderItem/delete", { ids: ids }).then((response) => {
           deleteRequest(this.directory + imgs)
           this.$message.success("删除成功")
           this.$refs.dataTable.loadTableData("reload")
