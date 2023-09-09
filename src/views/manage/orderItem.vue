@@ -30,9 +30,14 @@
                 7为cancelled:'订单已取消') -->
           </template>
         </el-table-column>
+        <el-table-column align="center" label="退换">
+          <template slot-scope="scope">
+            <el-button @click="reject(scope.row.id)" v-show="scope.row.etc.status == 5">拒绝</el-button>
+            <el-button @click="identify(scope.row.id)" v-show="scope.row.etc.status == 5">确认</el-button>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button @click="identify(scope.row.id)" v-show="scope.row.etc.status == 5">退换确认</el-button>
             <el-button @click="delive(scope.row.id)" v-show="scope.row.etc.status == 2">发货</el-button>
             <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
             <el-button type="danger" @click="del(scope.row.id, scope.row.img.substring(directory.length))">删除</el-button>
@@ -46,7 +51,7 @@
   
 <script>
 import { getRequest, postJsonRequest, postRequest, base_url, deleteRequest } from '@/api/axios'
-import { delivery,identify } from '@/api/orderItem'
+import { delivery,identify,reject } from '@/api/orderItem'
 import PageTable from '@/components/Edit/PageTable'
 import Edit from '@/components/Edit/orderItemEdit'
 
@@ -69,7 +74,7 @@ export default {
         { id: 1, name: "管理员" },
       ],
       searchData: { orderId: null },
-      orderType: ['全部', '待付款', '待发货', '待收货', '待评价', '退换货','已取消'],
+      orderType: ['全部', '待付款', '待发货', '待收货', '待评价', '退换货','已完成','已取消','已退款'],
     }
   },
   created() {
@@ -97,14 +102,26 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        identify("/orderItem/cancelOrderItem", { ids: id }).then((response) => {
+        identify("/orderItem/identify", { ids: id }).then((response) => {
           console.log(response)
           this.$refs.dataTable.loadTableData("reload")
         })
       }).catch(() => {
       })
     },
-
+    reject(id) {
+      this.$confirm("是否拒绝?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        reject("/orderItem/reject", { ids: id }).then((response) => {
+          console.log(response)
+          this.$refs.dataTable.loadTableData("reload")
+        })
+      }).catch(() => {
+      })
+    },
     getUrl(url) {
       if (url == null) {
         return base_url + "/resource/tool/placeholder.png"

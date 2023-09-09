@@ -9,6 +9,10 @@ export function identify(url,data) {
   return postRequest(url,data)
 }
 
+export function reject(url,data) {
+  return postRequest(url,data)
+}
+
 export function getSalesChart(url,data) {
   return postRequest(url,data)
 }
