@@ -9,11 +9,11 @@
                     <i v-show="!this.form.img" class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </el-form-item> -->
-            <el-form-item label="ID" prop="id" v-if="this.saveOrUpdate">
+            <!-- <el-form-item label="订单编号" prop="id" v-if="!this.saveOrUpdate">
                 <el-input v-model="form.id" autocomplete="off" style="width:30%"  :disabled="true">
                 </el-input>
-            </el-form-item>
-            <el-form-item label="用户编号" prop="userId">
+            </el-form-item> -->
+            <el-form-item label="用户编号" prop="userId" v-if="!this.saveOrUpdate">
                 <el-input v-model="form.userId" autocomplete="off" style="width:40%"></el-input>
             </el-form-item>
             <el-form-item label="收件人姓名" prop="name">

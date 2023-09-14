@@ -1,11 +1,15 @@
 <template>
     <el-dialog :title="title" :visible="visible" :close-on-click-modal="false" :before-close="handleClose">
         <el-form :model="form" :rules="rules" label-width="100px" ref="form">
-            <el-form-item label="ID" prop="id" v-if="this.saveOrUpdate">
+            <!-- <el-form-item label="ID" prop="id" v-if="!this.saveOrUpdate">
                 <el-input v-model="form.id" autocomplete="off" style="width:30%" :disabled="this.saveOrUpdate">
                 </el-input>
+            </el-form-item> -->
+            <el-form-item label="所属订单编号" prop="orderId" >
+                <el-input v-model="orderId" autocomplete="off" style="width:30%" :disabled="true">
+                </el-input>
             </el-form-item>
-            <el-form-item label="物品编号" prop="itemId" >
+            <el-form-item label="物品编号" prop="itemId" v-if="!this.saveOrUpdate">
                 <el-input v-model="form.itemId" autocomplete="off" style="width:30%"
                     :disabled="this.saveOrUpdate" placeholder="请在确认商品编号后填写"></el-input>
             </el-form-item>
@@ -13,7 +17,7 @@
                 <el-input v-model="form.num" autocomplete="off" style="width:30%"></el-input>
             </el-form-item>
             <el-form-item label="商品划分" prop="type">
-                <el-input v-model="form.type" autocomplete="off" style="width:30%"
+                <!-- <el-input v-model="form.type" autocomplete="off" style="width:30%"
                     :disabled="this.saveOrUpdate" placeholder="请输入0或者1"></el-input>
                 <el-tooltip class="item" effect="dark" placement="right">
                     <div slot="content"   class="content" >
@@ -21,27 +25,23 @@
                       <p>1:商品</p>
                     </div>
                     <el-button>提示</el-button>
-                </el-tooltip>
+                </el-tooltip> -->
+                <el-select v-model="form.gender" placeholder="请选择分类">
+                    <el-option :label=item :value=index v-for="(item,index) in classification" :key="index" >
+                    </el-option>
+                </el-select>
+
             </el-form-item>
             <el-form-item label="单价" prop="price">
                 <el-input v-model="form.price" autocomplete="off" style="width:30%">
                 </el-input>
             </el-form-item>
-            <el-form-item label="所属订单编号" prop="orderId">
-                <el-input v-model="orderId" autocomplete="off" style="width:30%" :disabled="true">
-                </el-input>
-            </el-form-item>
+            
             <el-form-item label="订单状态" prop="etc.status" v-if="this.saveOrUpdate">
-                <el-input v-model="form.etc.status" autocomplete="off" style="width:30%" placeholder="请输入状态编号">
-                </el-input>
-                <el-tooltip class="item" effect="dark" placement="right">
-                    <div slot="content" class="content">
-                        <div v-for="(row, index) in statusText" :key="index">
-                            {{ index }} : {{ statusText[index] }}
-                        </div>
-                    </div>
-                    <el-button>提示</el-button>
-                </el-tooltip>
+                <el-select v-model="form.etc.status" placeholder="请选择状态">
+                    <el-option :label=item :value=cnt v-for="(item,cnt) in statusText" :key="cnt" >
+                    </el-option>
+                </el-select>
             </el-form-item>
 
         </el-form>
@@ -170,21 +170,7 @@ export default {
             console.log("form",this.form)
             this.$refs["form"].validate((valid) => {
                 if (valid) {
-                    // if (this.password.length != 0) {
-                    //     this.form.password = this.password
-                    // }
-                    // if (this.saveOrUpdate) {
-                    //     this.form.password = password
-                    // } else {
-                    //     this.form.password = md5(md5(this.form.password))
-                    // }
-                    // this.form.password = this.form.password
-                    // if (this.imageUrl != this.form.img) {
-                    //     this.$refs["img"].submit()
-                    // }
-                    // else {
                         this.saveUpdate()
-                    // }
                 }
             })
         },
